@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 
-const API_BASE_URL = 'https://tagmyidea.el.r.appspot.com';
-// const API_BASE_URL = 'http://localhost:5000';
+// const API_BASE_URL = 'https://tagmyidea.el.r.appspot.com';
+const API_BASE_URL = 'http://localhost:5000';
 
 
 export async function googleSignIn() {
@@ -135,6 +135,72 @@ export async function createIdea(idea:unknown) {
         throw new Error('Failed to upvote idea');
     } catch (error) {
         console.error('Get Feed Error:', error);
+        throw error;
+    }
+}
+
+export async function getList(list:unknown[]) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+    try {
+        const response = await axios.get(`${API_BASE_URL}/user/fetch-list`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                list: JSON.stringify(list)
+            }
+        });
+        if (response.status === 200) {
+            return response.data.list;  
+        }
+        throw new Error('Failed to fetch list');
+    } catch (error) {
+        console.error('Get List Error:', error);
+        throw error;
+    }
+}
+
+export async function follow(followId:string) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+    try {
+        const response = await axios.post(`${API_BASE_URL}/user/follow`, { followId }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status === 200) {
+            return response.data;  
+        }
+        throw new Error('Failed to follow user');
+    } catch (error) {
+        console.error('Follow User Error:', error);
+        throw error;
+    }
+}
+
+export async function unfollow(unfollowId:string) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+    try {
+        const response = await axios.post(`${API_BASE_URL}/user/unfollow`, { unfollowId }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status === 200) {
+            return response.data;  
+        }
+        throw new Error('Failed to unfollow user');
+    } catch (error) {
+        console.error('Unfollow User Error:', error);
         throw error;
     }
 }

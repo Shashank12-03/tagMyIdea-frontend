@@ -10,16 +10,16 @@ import {
   Link as LinkIcon, 
   Plus,
   Camera,
-  Globe
+  Globe,
+  UserMinus
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
-import { getUserById, updateProfile } from '../../services/api';
+import { getUserById, updateProfile, getList } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId?: string }>();
-  console.log('User ID from params:', userId);
   const { user: currentUser} = useAuth();
   // const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState<User | null>(null);
@@ -143,6 +143,15 @@ const ProfilePage: React.FC = () => {
       day: 'numeric'
     });
   };
+  const handleList = async (list: unknown[]) => {
+    try {
+      const userIds = Array.isArray(list) ? list : [];
+      const profiles = await getList(userIds);
+      navigate('/user-list', { state: { profiles } });
+    } catch (error) {
+      console.error('Error fetching user list:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -242,6 +251,14 @@ const ProfilePage: React.FC = () => {
                     )
                   ) : (
                     <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all">
+                      {/* { isFollowing ? (
+                        <UserPlus className="w-4 h-4" />
+                        <span>Follow</span>
+                      ) :(
+                        <UserMinus className="w-4 h-4" />
+                        <span>Unfollow</span>
+                      )
+                      } */}
                       <UserPlus className="w-4 h-4" />
                       <span>Follow</span>
                     </button>
@@ -250,7 +267,7 @@ const ProfilePage: React.FC = () => {
               </div>
 
               {/* Bio */}
-              <div className="mt-4">
+              <div className="mt-6">
                 {isEditing ? (
                   <textarea
                     value={editForm.bio}
@@ -265,19 +282,33 @@ const ProfilePage: React.FC = () => {
                   </p>
                 )}
               </div>
-
-              {/* Stats */}
               <div className="flex items-center space-x-6 mt-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
                   <span>Joined {profileUser.dateJoined ? formatDate(profileUser.dateJoined) : 'Recently'}</span>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <span className="flex items-center space-x-1">
-                    <Users className="w-4 h-4" />
-                    <span>{profileUser.followers?.length || 0} followers</span>
-                  </span>
-                  <span>{profileUser.following?.length || 0} following</span>
+                  <div className="flex flex-col items-center">
+                    <button
+                      className="text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none"
+                      onClick={() => handleList(profileUser.followers)}
+                      type="button"
+                    >
+                      {profileUser.followers?.length || 0}
+                    </button>
+                    <span className="text-xs text-gray-500 mt-1">Followers</span>
+                  </div>
+                  {/* Following */}
+                  <div className="flex flex-col items-center">
+                    <button
+                      className="text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none"
+                      onClick={() => handleList(profileUser.following)} 
+                      type="button"
+                    >
+                      {profileUser.following?.length || 0}
+                    </button>
+                    <span className="text-xs text-gray-500 mt-1">Following</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -355,7 +386,7 @@ const ProfilePage: React.FC = () => {
       {/* Projects Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {isOwnProfile ? 'Your Ideas' : `${profileUser.username}'s Projects`}
+          {isOwnProfile ? 'Your Ideas' : `${profileUser.username}'s ideas`}
         </h2>
         <div className="text-center py-8 text-gray-500">
           <p>No Ideas shared yet.</p>

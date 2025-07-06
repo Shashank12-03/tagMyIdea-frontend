@@ -1,6 +1,6 @@
 export interface User {
-  following: unknown;
-  followers: unknown;
+  following: unknown[];
+  followers: unknown[];
   dateJoined: unknown;
   links: never[];
   photo: string;
