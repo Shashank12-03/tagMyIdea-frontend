@@ -6,7 +6,7 @@ import HomePage from './components/Home/HomePage';
 import LoginPage from './components/Auth/LoginPage';
 import CreateProjectForm from './components/ProjectIdeas/CreateProjectForm';
 import ProfilePage from './components/Profile/ProfilePage';
-import UserListPage from './components/Users/userlistpage';
+import UserListPage from './components/Users/UserListPage';
 
 function App() {
   return (
