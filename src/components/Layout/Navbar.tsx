@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <img
-              src="/images/logo.png"
+              src="/image/logo.png"
               alt="Logo"
               className="w-11 h-11 rounded-full object-cover shadow-md"
             />
