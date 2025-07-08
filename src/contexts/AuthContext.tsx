@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getUserProfile } from '../services/api';
+import { ProjectIdea } from '../types';
 // import { getUserProfile } from '../services/api';
 
 interface User {
@@ -9,9 +10,10 @@ interface User {
   photo?: string;
   bio?: string;
   dateJoined?: Date;
-  followers?: string[];
-  following?: string[];
+  followers?: unknown[];
+  following?: unknown[];
   links?: string[];
+  ideasPosted?: ProjectIdea[];
 }
 
 interface AuthContextType {

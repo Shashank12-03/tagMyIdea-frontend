@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ChevronRight } from 'lucide-react';
+import { Heart, ChevronRight, LucideSave } from 'lucide-react';
 import { ProjectIdea } from '../../types';
 
 interface ProjectCardProps {
   project: ProjectIdea;
   onLike?: (id: string) => void;
+  onSave?: (id: string) => void; 
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
@@ -114,6 +115,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
             >
               <Heart className="w-4 h-4" />
               <span className="text-sm">{project.upvotes}</span>
+            </button>
+            <button
+              onClick={() => onSave?.(project._id)}
+              className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
+            >
+              <LucideSave className="w-4 h-4" />
             </button>
             {/* <div className="flex items-center space-x-1 text-gray-500">
               <MessageCircle className="w-4 h-4" />

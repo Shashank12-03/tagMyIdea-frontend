@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// const API_BASE_URL = 'http://localhost:5000';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:5000';
 
 console.log('API_BASE_URL:', API_BASE_URL);
 export async function googleSignIn() {
@@ -26,6 +26,7 @@ export async function getUserProfile() {
                 Authorization: `Bearer ${token}`,
             },
         });
+        console.log('User Profile fetched successfully:', response.data);
         return response.data.user;
     } catch (error) {
         console.error('Get User Profile Error:', error);
@@ -90,7 +91,17 @@ export async function getFeed(){
                 Authorization: `Bearer ${token}`,
             },
         }); 
-        return response.data.ideas;
+        const feed = response.data.feed;
+        const data = {
+            ideas: feed.ideas.map((idea: any) => ({
+                ...idea,
+                'username':feed.user.username,
+                'photo': feed.user.photo,
+                'id': feed.user._id,
+            })),
+        }
+        console.log('Feed fetched successfully:', data);
+        return data;
     } catch (error) {
         console.error('Get Feed Error:', error);
         throw error;
@@ -201,6 +212,27 @@ export async function unfollow(unfollowId:string) {
         throw new Error('Failed to unfollow user');
     } catch (error) {
         console.error('Unfollow User Error:', error);
+        throw error;
+    }
+}
+
+export async function getSavedIdeas(id:unknown) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+    try {
+        const response = await axios.get(`${API_BASE_URL}/user/get-saved-ideas/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status === 200) {
+            return response.data.savedIdeas;  
+        }
+        throw new Error('Failed to fetch user ideas');
+    } catch (error) {
+        console.error('Get User Ideas Error:', error);
         throw error;
     }
 }

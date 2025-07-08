@@ -8,6 +8,7 @@ export interface User {
   id: string;
   email: string;
   bio?: string;
+  ideasPosted: ProjectIdea[]; 
 }
 
 export interface ProjectIdea {

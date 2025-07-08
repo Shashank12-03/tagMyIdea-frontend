@@ -4,8 +4,7 @@ import {
   Edit3, 
   Save, 
   X, 
-  Calendar, 
-  Users, 
+  Calendar,  
   UserPlus, 
   Link as LinkIcon, 
   Plus,
@@ -17,6 +16,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
 import { getUserById, updateProfile, getList } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import ProjectList from '../ProjectIdeas/ProjectList';
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId?: string }>();
@@ -388,9 +388,13 @@ const ProfilePage: React.FC = () => {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {isOwnProfile ? 'Your Ideas' : `${profileUser.username}'s ideas`}
         </h2>
-        <div className="text-center py-8 text-gray-500">
-          <p>No Ideas shared yet.</p>
-        </div>
+        {profileUser?.ideasPosted && profileUser.ideasPosted.length > 0 ? (
+          <ProjectList ideas={profileUser.ideasPosted} />
+        ) : (
+          <p className="text-gray-500 text-sm">
+            {isOwnProfile ? "You haven't posted any ideas yet." : `${profileUser.username} hasn't posted any ideas yet.`}
+          </p>
+        )}
       </div>
     </div>
   );
