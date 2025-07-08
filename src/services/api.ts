@@ -90,7 +90,7 @@ export async function getFeed(){
                 Authorization: `Bearer ${token}`,
             },
         }); 
-        return response.data.feed;
+        return response.data.ideas;
     } catch (error) {
         console.error('Get Feed Error:', error);
         throw error;
