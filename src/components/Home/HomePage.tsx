@@ -4,7 +4,7 @@ import { ArrowRight, Lightbulb, Users, Rocket, Star, TrendingUp, Clock, Filter }
 import ProjectList from '../ProjectIdeas/ProjectList';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProjectIdea } from '../../types';
-import { getFeed } from '../../services/api';
+import { getFeed, triggerJob } from '../../services/api';
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -22,8 +22,15 @@ const HomePage: React.FC = () => {
     }
     setIsLoadingFeed(false);
   };
+  const triggerFeedJob = async () => {
+    const res = await triggerJob();
+    if (res) {
+      console.log('Feed job triggered successfully');
+    }
+  };
   useEffect(() => {
     if (user) {
+      triggerFeedJob();
       loadFeed();
     }
   }, [user, isLoadingFeed]);
@@ -233,7 +240,7 @@ const HomePage: React.FC = () => {
               Your Feed ({feedIdeas.length} ideas)
             </h2>
           </div>
-          <ProjectList ideas={feedIdeas}/>
+          <ProjectList ideas={feedIdeas} saveIdeas={user.saveIdeas?.map(i => i._id) ?? []} />
         </div>
       ) : (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">

@@ -14,6 +14,7 @@ interface User {
   following?: unknown[];
   links?: string[];
   ideasPosted?: ProjectIdea[];
+  saveIdeas?: ProjectIdea[];
 }
 
 interface AuthContextType {

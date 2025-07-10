@@ -17,10 +17,12 @@ import { User } from '../../types';
 import { getUserById, updateProfile, getList } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import ProjectList from '../ProjectIdeas/ProjectList';
+import Avatar from '../UI/Avatar';
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId?: string }>();
   const { user: currentUser} = useAuth();
+  console.log(currentUser);
   // const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -184,20 +186,34 @@ const ProfilePage: React.FC = () => {
             <div className="relative">
               {isEditing ? (
                 <div className="relative">
-                  <img
-                    src={editForm.photo || 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150'}
-                    alt={profileUser.username}
-                    className="w-32 h-32 rounded-full border-4 border-white object-cover"
+                  <Avatar
+                    username={profileUser.username}
+                    photo={editForm.photo}
+                    size="2xl"
+                    className="border-4 border-white shadow-lg"
                   />
-                  <button className="absolute bottom-2 right-2 p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
-                    <Camera className="w-4 h-4" />
-                  </button>
+                  <div className="absolute bottom-2 right-2">
+                    <input
+                      type="url"
+                      value={editForm.photo}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, photo: e.target.value }))}
+                      className="hidden"
+                      id="photo-input"
+                    />
+                    <label
+                      htmlFor="photo-input"
+                      className="flex items-center justify-center p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors cursor-pointer"
+                    >
+                      <Camera className="w-4 h-4" />
+                    </label>
+                  </div>
                 </div>
               ) : (
-                <img
-                  src={profileUser.photo || 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150'}
-                  alt={profileUser.username}
-                  className="w-32 h-32 rounded-full border-4 border-white object-cover"
+                <Avatar
+                  username={profileUser.username}
+                  photo={profileUser.photo}
+                  size="2xl"
+                  className="border-4 border-white shadow-lg"
                 />
               )}
             </div>
@@ -389,7 +405,7 @@ const ProfilePage: React.FC = () => {
           {isOwnProfile ? 'Your Ideas' : `${profileUser.username}'s ideas`}
         </h2>
         {profileUser?.ideasPosted && profileUser.ideasPosted.length > 0 ? (
-          <ProjectList ideas={profileUser.ideasPosted} />
+          <ProjectList ideas={profileUser.ideasPosted} saveIdeas={[]} />
         ) : (
           <p className="text-gray-500 text-sm">
             {isOwnProfile ? "You haven't posted any ideas yet." : `${profileUser.username} hasn't posted any ideas yet.`}

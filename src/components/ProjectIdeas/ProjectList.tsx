@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Filter, Grid, List } from 'lucide-react';
 import ProjectCard from './ProjectCard';
 import { ProjectIdea } from '../../types';
-import { upVote } from '../../services/api';
+import {upVote } from '../../services/api';
 interface ProjectListProps {
   ideas: ProjectIdea[];
+  saveIdeas: string[];
 }
 
-const ProjectList: React.FC<ProjectListProps> = ({ ideas }) => {
+const ProjectList: React.FC<ProjectListProps> = ({ ideas , saveIdeas}) => {
   const [projects, setProjects] = useState<ProjectIdea[]>(ideas);
   const [filteredProjects, setFilteredProjects] = useState<ProjectIdea[]>(ideas);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
@@ -121,6 +122,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ ideas }) => {
               key={project._id} 
               project={project}
               onLike={handleLike}
+              saveIdeas={saveIdeas}
             />
           ))}
         </div>

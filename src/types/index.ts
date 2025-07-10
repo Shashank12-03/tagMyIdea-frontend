@@ -9,6 +9,7 @@ export interface User {
   email: string;
   bio?: string;
   ideasPosted: ProjectIdea[]; 
+  saveIdeas: ProjectIdea[];
 }
 
 export interface ProjectIdea {

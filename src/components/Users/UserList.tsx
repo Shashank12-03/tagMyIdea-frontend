@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlus, UserMinus, Users, Search, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { follow, unfollow } from '../../services/api'; // Adjust import based on your API structure
+import Avatar from '../UI/Avatar';
 
 interface SimpleProfile {
   _id: string;
@@ -174,11 +175,14 @@ const UserList: React.FC<UserListProps> = ({
                         className="w-12 h-12 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-300 transition-all duration-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-purple-300 transition-all duration-200">
-                        <span className="text-white font-semibold text-lg">
-                          {user.username.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                      <div className="flex-shrink-0">
+                        <Avatar
+                          username={user.username}
+                          photo={user.photo}
+                          size="lg"
+                          className="group-hover:ring-2 group-hover:ring-purple-300"
+                        />
+                  </div>
                     )}
                   </div>
 

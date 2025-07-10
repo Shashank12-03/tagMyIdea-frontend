@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ChevronRight, LucideSave } from 'lucide-react';
 import { ProjectIdea } from '../../types';
-
+import { useState } from 'react';
+import { updateSave } from '../../services/api';
+import Avatar from '../UI/Avatar';
 interface ProjectCardProps {
   project: ProjectIdea;
   onLike?: (id: string) => void;
   onSave?: (id: string) => void; 
+  saveIdeas: string[];
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike, saveIdeas }) => {
+
+  const [saved, setSaved] = useState(false);
+  const [saveAnimating, setSaveAnimating] = useState(false);
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':
@@ -20,6 +27,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
         return 'bg-red-100 text-red-800 border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+  useEffect(() => {
+    if (saveIdeas && saveIdeas.length > 0) {
+      setSaved(saveIdeas.includes(project._id));
+    }
+  }, [saveIdeas, project._id]);
+
+  const handleSave = async () => {
+    setSaveAnimating(true);
+    console.log('Saving project:', project._id, ' saved:', !saved);
+    const res = await updateSave(project._id, !saved);
+    if(res){
+      setSaved(!saved);
+      setTimeout(() => setSaveAnimating(false), 400); // Animation duration
     }
   };
 
@@ -94,9 +116,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
               />
             ) : (
               <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-medium">
-                  {(project?.username ?? '').charAt(0)}
-                </span>
+                <Avatar
+                  username={project.username ?? 'Anonymous'}
+                  photo={project.photo}
+                  size="sm"
+                />
               </div>
             )}
             <div>
@@ -117,10 +141,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike }) => {
               <span className="text-sm">{project.upvotes}</span>
             </button>
             <button
-              onClick={() => onSave?.(project._id)}
-              className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors"
+              onClick={handleSave}
+              className={`flex items-center space-x-1 transition-colors ${
+                saved ? 'text-blue-600' : 'text-gray-500 hover:text-blue-500'
+              } ${saveAnimating ? 'scale-125 animate-pulse' : ''}`}
+              aria-label="Save"
             >
-              <LucideSave className="w-4 h-4" />
+              <LucideSave
+                className="w-4 h-4"
+                fill={saved ? 'currentColor' : 'none'}
+                stroke={saved ? 'currentColor' : 'currentColor'}
+              />
             </button>
             {/* <div className="flex items-center space-x-1 text-gray-500">
               <MessageCircle className="w-4 h-4" />

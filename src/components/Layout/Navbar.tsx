@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Plus, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Avatar from '../UI/Avatar';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -77,7 +78,11 @@ const Navbar: React.FC = () => {
                       />
                     ) : (
                       <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-white" />
+                        <Avatar
+                          username={user.username}
+                          photo={user.photo}
+                          size="sm"
+                        />
                       </div>
                     )}
                     <span className="hidden sm:inline text-sm font-medium text-gray-700">
