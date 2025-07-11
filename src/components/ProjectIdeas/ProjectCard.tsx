@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, ChevronRight, LucideSave } from 'lucide-react';
+import { Heart, LucideSave } from 'lucide-react';
 import { ProjectIdea } from '../../types';
 import { useState } from 'react';
 import { updateSave } from '../../services/api';
@@ -63,8 +62,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike, saveIdeas })
             <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
               {project.title}
             </h3>
-            <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+            <p className="text-gray-600 text-sm mb-3">
               {project.description}
+            </p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+              How to Build
+            </h2>
+            <p className="text-gray-600 text-sm  mb-3">
+              {project.howToBuild}
             </p>
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(project.tags)} ml-4`}>
@@ -158,13 +163,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike, saveIdeas })
               <span className="text-sm">{project.comments}</span>
             </div> */}
           </div>
-          <Link
-            to={`/ideas/${project._id}`}
-            className="flex items-center space-x-1 text-purple-600 hover:text-purple-700 text-sm font-medium transition-colors"
-          >
-            <span>View Details</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+
         </div>
       </div>
     </div>

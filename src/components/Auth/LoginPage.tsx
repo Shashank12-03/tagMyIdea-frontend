@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Lightbulb, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 // import { googleSignIn } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +36,11 @@ const LoginPage: React.FC = () => {
           {/* Logo and Branding */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mb-4">
-              <Lightbulb className="w-8 h-8 text-white" />
+              <img
+                src="/image/logo.png"
+                alt="Logo"
+                className="w-11 h-11 rounded-full object-cover shadow-md"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Welcome to TagMyIdea
