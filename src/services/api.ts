@@ -150,7 +150,7 @@ export async function getFeed() {
                     ...idea,
                     'username': idea.author?.username || 'Unknown',
                     'photo': idea.author?.photo || '',
-                    'id': idea.author?._id || '',
+                    'authorId': idea.author?._id || '',
                 })),
             };
             return data;

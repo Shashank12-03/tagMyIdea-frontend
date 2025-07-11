@@ -13,6 +13,7 @@ export interface User {
 }
 
 export interface ProjectIdea {
+  authorId: string;
   username: string | undefined;
   userId : string;
   photo: string;

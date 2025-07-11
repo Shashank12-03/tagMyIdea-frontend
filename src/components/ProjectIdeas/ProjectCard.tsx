@@ -4,6 +4,7 @@ import { ProjectIdea } from '../../types';
 import { useState } from 'react';
 import { updateSave } from '../../services/api';
 import Avatar from '../UI/Avatar';
+import { Link } from 'react-router-dom';
 interface ProjectCardProps {
   project: ProjectIdea;
   onLike?: (id: string) => void;
@@ -129,8 +130,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onLike, saveIdeas })
               </div>
             )}
             <div>
-              <p className="text-sm font-medium text-gray-900">{project.username}</p>
-              <p className="text-xs text-gray-500">{formatDate(project.createdAt)}</p>
+              <Link to={`/profile/${project.authorId}`} className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors">
+                {project.username || 'Anonymous'}
+              </Link>
+                <p className="text-xs text-gray-500">{formatDate(project.createdAt)}</p>
             </div>
           </div>
         </div>
