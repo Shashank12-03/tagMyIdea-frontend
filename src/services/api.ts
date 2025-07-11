@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// const API_BASE_URL = 'http://localhost:5000';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:5000';
 
 console.log('API_BASE_URL:', API_BASE_URL);
 
@@ -53,7 +53,7 @@ export async function getUserProfile() {
     }
 }
 
-export async function updateProfile(data) {
+export async function updateProfile(data: { id?: string; email?: string; dateJoined?: Date | undefined; followers?: unknown[] | undefined; following?: unknown[] | undefined; username?: string; bio?: string; photo?: string; links?: string[]; }) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -88,7 +88,7 @@ export async function updateProfile(data) {
     }
 }
 
-export async function getUserById(userId) {
+export async function getUserById(userId: string) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -144,13 +144,13 @@ export async function getFeed() {
             if (!feed.ideas || !Array.isArray(feed.ideas)) {
                 throw new Error('Invalid feed data structure');
             }
-            
+            console.log('Feed fetched successfully:', feed);
             const data = {
-                ideas: feed.ideas.map((idea) => ({
+                ideas: feed.ideas.map((idea: object) => ({
                     ...idea,
-                    'username': feed.user?.username || 'Unknown',
-                    'photo': feed.user?.photo || '',
-                    'id': feed.user?._id || '',
+                    'username': idea.author?.username || 'Unknown',
+                    'photo': idea.author?.photo || '',
+                    'id': idea.author?._id || '',
                 })),
             };
             return data;
@@ -169,7 +169,7 @@ export async function getFeed() {
     }
 }
 
-export async function upVote(ideaId) {
+export async function upVote(ideaId: string) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -203,7 +203,7 @@ export async function upVote(ideaId) {
     }
 }
 
-export async function createIdea(idea) {
+export async function createIdea(idea: { title: string; description: string; techStack: string[]; tags: "easy" | "medium" | "hard"; howToBuild: string; }) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -238,7 +238,7 @@ export async function createIdea(idea) {
     }
 }
 
-export async function getList(list) {
+export async function getList(list: unknown[]) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -275,7 +275,7 @@ export async function getList(list) {
     }
 }
 
-export async function follow(followId) {
+export async function follow(followId: string) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -309,7 +309,7 @@ export async function follow(followId) {
     }
 }
 
-export async function unfollow(unfollowId) {
+export async function unfollow(unfollowId: string) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -343,7 +343,7 @@ export async function unfollow(unfollowId) {
     }
 }
 
-export async function getSavedIdeas(id) {
+export async function getSavedIdeas(id: string) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -413,7 +413,7 @@ export async function triggerJob() {
     }
 }
 
-export async function updateSave(ideaId, save) {
+export async function updateSave(ideaId: string, save: boolean) {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
