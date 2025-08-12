@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mb-4">
               <Lightbulb className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">1,250+</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">100+</h3>
             <p className="text-gray-600">Project Ideas Shared</p>
           </div>
           
@@ -87,14 +87,6 @@ const HomePage: React.FC = () => {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">1</h3>
             <p className="text-gray-600">Active Developers</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl mb-4">
-              <Rocket className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">420+</h3>
-            <p className="text-gray-600">Ideas shared</p>
           </div>
         </div>
 
