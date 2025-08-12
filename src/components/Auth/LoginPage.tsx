@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
   }
 
   const handleGoogleLogin = async () => {
-    window.location.href = 'https://tagmyidea.el.r.appspot.com/auth/google';
+    window.location.href = 'https://tagmyidea-backend.onrender.com/auth/google';
     // console.log('Google Sign-In Response:', response);
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
