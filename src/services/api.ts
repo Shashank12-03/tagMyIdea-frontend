@@ -371,7 +371,7 @@ export async function getSavedIdeas(id: string) {
             throw new Error('Authentication failed. Please log in again.');
         }
         if (error.response) {
-            throw new Error(error.response.data?.message || 'Failed to fetch saved ideas');
+            throw new Error('Failed to fetch saved ideas');
         }
         throw error;
     }
@@ -447,6 +447,61 @@ export async function updateSave(ideaId: string, save: boolean) {
         }
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to update save status');
+        }
+        throw error;
+    }
+}
+
+export async function getAnalytics() {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/analytics`);
+        if (response.status != 200 ) {
+           throw new Error('Failed to fetch details');
+        }
+        console.log('analytics', response.data);
+        return response.data;
+        
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data?.message || 'Failed to update save status');
+        }
+        throw error;
+    }
+}
+
+export async function search(searchString: string, user:boolean = false) {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+        
+        if (!searchString || typeof searchString !== 'string') {
+            throw new Error('Search string is required');
+        }
+        
+        const response = await axios.get(`${API_BASE_URL}/user/search`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                searchString,
+                user
+            }
+        });
+        
+        if (response.status === 200 && response.data?.results) {
+            return response.data.results;
+        }
+        throw new Error('Failed to fetch search results');
+    } catch (error) {
+        console.error('Search Error:', error);
+        if (error.response?.status === 401) {
+            localStorage.removeItem('authToken');
+            throw new Error('Authentication failed. Please log in again.');
+        }
+        if (error.response) {
+            throw new Error(error.response.data?.message || 'Failed to fetch search results');
         }
         throw error;
     }

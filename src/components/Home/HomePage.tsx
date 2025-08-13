@@ -4,7 +4,7 @@ import { ArrowRight, Lightbulb, Users, Rocket, Star, TrendingUp, Clock, Filter }
 import ProjectList from '../ProjectIdeas/ProjectList';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProjectIdea } from '../../types';
-import { getFeed, triggerJob } from '../../services/api';
+import { getAnalytics, getFeed, triggerJob } from '../../services/api';
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -12,7 +12,7 @@ const HomePage: React.FC = () => {
   const [isLoadingFeed, setIsLoadingFeed] = useState(true);
   const [feedError, setFeedError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
-
+  const [analytics, setAnalytics] = useState<{activeUsers:number, ideasShared:number}>({});
   // Load feed for authenticated users
   const loadFeed = async () => {
     const feed = await getFeed();
@@ -28,15 +28,28 @@ const HomePage: React.FC = () => {
       console.log('Feed job triggered successfully');
     }
   };
+
+  const loadAnalytics = async () => {
+    const data = await getAnalytics();
+    console.log('analytics', data);
+    if (data) {
+      setAnalytics(data);
+    } else {
+      setAnalytics({
+        ideasShared: 0,
+        activeUsers: 0,
+      });
+    }
+  };  
   useEffect(() => {
     if (user) {
       triggerFeedJob();
       loadFeed();
     }
+    loadAnalytics();
   }, [user, isLoadingFeed]);
 
   
-
   if (!user) {
     return (
       <div className="space-y-12">
@@ -77,16 +90,23 @@ const HomePage: React.FC = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mb-4">
               <Lightbulb className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">100+</h3>
-            <p className="text-gray-600">Project Ideas Shared</p>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{analytics.activeUsers}</h3>
+            <p className="text-gray-600">Active users</p>
           </div>
-          
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl mb-4">
+              <Rocket className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{analytics.ideasShared}</h3>
+            <p className="text-gray-600">Ideas shared</p>
+          </div>
+
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl mb-4">
               <Users className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">1</h3>
-            <p className="text-gray-600">Active Developers</p>
+            <p className="text-gray-600">Developer</p>
           </div>
         </div>
 
