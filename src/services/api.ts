@@ -388,7 +388,7 @@ export async function triggerJob() {
         const currentTime = Date.now();
 
         if (!lastTrigger || currentTime - parseInt(lastTrigger) > 3 * 60 * 60 * 1000) {
-            const response = await axios.post(`${API_BASE_URL}/user/test-jobs`, {}, {
+            const response = await axios.post(`${API_BASE_URL}/system/test-jobs`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
