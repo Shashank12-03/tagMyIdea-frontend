@@ -9,7 +9,7 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ 
-  username, 
+  username = '', 
   photo, 
   size = 'md', 
   className = '',
@@ -27,6 +27,7 @@ const Avatar: React.FC<AvatarProps> = ({
 
   // Generate consistent color based on username
   const generateColor = (name: string) => {
+    if (!name || typeof name !== 'string') return 'from-[#4555EA] to-[#8938EA]'; // <-- Guard clause
     const colors = [
       'from-[#8938EA] to-[#4555EA]',
       'from-[#4555EA] to-[#8938EA]',
@@ -51,9 +52,8 @@ const Avatar: React.FC<AvatarProps> = ({
     for (let i = 0; i < name.length; i++) {
       const char = name.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+      hash = hash & hash;
     }
-    
     return colors[Math.abs(hash) % colors.length];
   };
 

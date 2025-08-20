@@ -42,10 +42,7 @@ export async function getUserProfile() {
         throw new Error('Invalid user profile response');
     } catch (error) {
         console.error('Get User Profile Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to fetch user profile');
         }
@@ -77,10 +74,7 @@ export async function updateProfile(data: { id?: string; email?: string; dateJoi
         throw new Error('Failed to update profile');
     } catch (error) {
         console.error('Update Profile Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to update profile');
         }
@@ -111,10 +105,7 @@ export async function getUserById(userId: string) {
         throw new Error('User not found');
     } catch (error) {
         console.error('Get User By ID Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response?.status === 404) {
             throw new Error('User not found');
         }
@@ -158,10 +149,7 @@ export async function getFeed() {
         throw new Error('Invalid feed response');
     } catch (error) {
         console.error('Get Feed Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to fetch feed');
         }
@@ -192,10 +180,7 @@ export async function upVote(ideaId: string) {
         throw new Error('Failed to upvote idea');
     } catch (error) {
         console.error('Upvote Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to upvote idea');
         }
@@ -227,10 +212,7 @@ export async function createIdea(idea: { title: string; description: string; tec
         throw new Error('Failed to create idea');
     } catch (error) {
         console.error('Create Idea Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to create idea');
         }
@@ -264,10 +246,7 @@ export async function getList(list: unknown[]) {
         throw new Error('Failed to fetch list');
     } catch (error) {
         console.error('Get List Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to fetch list');
         }
@@ -298,10 +277,7 @@ export async function follow(followId: string) {
         throw new Error('Failed to follow user');
     } catch (error) {
         console.error('Follow User Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to follow user');
         }
@@ -332,10 +308,6 @@ export async function unfollow(unfollowId: string) {
         throw new Error('Failed to unfollow user');
     } catch (error) {
         console.error('Unfollow User Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to unfollow user');
         }
@@ -366,10 +338,7 @@ export async function getSavedIdeas(id: string) {
         throw new Error('Failed to fetch saved ideas');
     } catch (error) {
         console.error('Get Saved Ideas Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error('Failed to fetch saved ideas');
         }
@@ -441,10 +410,7 @@ export async function updateSave(ideaId: string, save: boolean) {
         throw new Error('Failed to update save status');
     } catch (error) {
         console.error('Update Save Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to update save status');
         }
@@ -469,7 +435,7 @@ export async function getAnalytics() {
     }
 }
 
-export async function search(searchString: string, user:boolean = false) {
+export async function search(searchString: string, user:string = '0') {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -489,17 +455,15 @@ export async function search(searchString: string, user:boolean = false) {
                 user
             }
         });
-        
-        if (response.status === 200 && response.data?.results) {
-            return response.data.results;
+        // console.log('Search response:', response.data);
+        if (response.status === 200 && response.data?.searchResult) {
+            // console.log('Search results:', response.data.results);
+            return response.data.searchResult;
         }
         throw new Error('Failed to fetch search results');
     } catch (error) {
         console.error('Search Error:', error);
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            throw new Error('Authentication failed. Please log in again.');
-        }
+        
         if (error.response) {
             throw new Error(error.response.data?.message || 'Failed to fetch search results');
         }

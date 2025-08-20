@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [searchString, setsearchString] = useState('');
+  const [searchString, setSearchString] = useState('');
   const [searchType, setSearchType] = useState<'idea' | 'user'>('idea');
   const handleLogout = () => {
     logout();
@@ -22,12 +22,20 @@ const Navbar: React.FC = () => {
       e.preventDefault();
       let result;
       if (searchString.trim()) {
-        result = await search(searchString, (searchType === 'user')?true : false);
+        result = await search(searchString, (searchType === 'user')?'1' : '0');
       }
       return result;
     };
+    
     const res = await getSearchResult();
-    console.log(res);
+    console.log('Search Results:', res);
+    // Navigate to search results page with the results
+    if (res) {
+      console.log('Search Results naviated to search');
+      navigate(`/search?q=${encodeURIComponent(searchString)}&type=${searchType}`, {
+        state: { searchResults: res }
+      });
+    }
   };
 
   return (
@@ -48,30 +56,28 @@ const Navbar: React.FC = () => {
 
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="flex-1 max-w-lg mx-8 hidden md:flex items-center space-x-2">
+            {/* Search Type Dropdown */}
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value as 'idea' | 'user')}
+              className="px-3 py-2 border border-gray-300 rounded-l-full focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none bg-white text-sm"
+            >
+              <option value="idea">Ideas</option>
+              <option value="user">Users</option>
+            </select>
+            
+            {/* Search Input */}
             <div className="relative flex-1">
+              
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder={`Search ${searchType === 'user' ? 'users' : 'project ideas'}...`}
                 value={searchString}
-                onChange={(e) => setsearchString(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                onChange={(e) => setSearchString(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 border-l-0 rounded-r-full focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
               />
             </div>
-            <select
-              value={searchType}
-              onChange={e => setSearchType(e.target.value as 'idea' | 'user')}
-              className="border border-gray-300 rounded-full px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white text-gray-700"
-            >
-              <option value="idea">Ideas</option>
-              <option value="user">Users</option>
-            </select>
-            <button
-              type="submit"
-              className="ml-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Search
-            </button>
           </form>
 
           {/* Right side actions */}

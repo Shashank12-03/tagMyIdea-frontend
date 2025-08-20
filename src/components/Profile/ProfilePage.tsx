@@ -10,35 +10,37 @@ import {
   Plus,
   Camera,
   Globe,
-  UserMinus
+  UserMinus,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
-import { getUserById, updateProfile, getList } from '../../services/api';
+import { getUserById, updateProfile, getList, follow, unfollow } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import ProjectList from '../ProjectIdeas/ProjectList';
 import Avatar from '../UI/Avatar';
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId?: string }>();
-  const { user: currentUser} = useAuth();
-  console.log(currentUser);
-  // const navigate = useNavigate();
+  const { user: currentUser, updateUser } = useAuth(); // Assuming updateUser exists in AuthContext
+  const [followAnimating, setFollowAnimating] = useState(false);
+  const [followSuccess, setFollowSuccess] = useState(false);
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setSaving] = useState(false);
   const [newLink, setNewLink] = useState('');
-  
   const [editForm, setEditForm] = useState({
     username: '',
     bio: '',
     photo: '',
     links: [] as string[]
   });
+  
   // Determine if viewing own profile
   const isOwnProfile = !userId || userId === currentUser?.id;
   const navigate = useNavigate();
+
   useEffect(() => {
     const loadProfile = async () => {
       setIsLoading(true);
@@ -145,6 +147,7 @@ const ProfilePage: React.FC = () => {
       day: 'numeric'
     });
   };
+
   const handleList = async (list: unknown[]) => {
     try {
       const userIds = Array.isArray(list) ? list : [];
@@ -152,6 +155,94 @@ const ProfilePage: React.FC = () => {
       navigate('/user-list', { state: { profiles } });
     } catch (error) {
       console.error('Error fetching user list:', error);
+    }
+  };
+
+  const isFollowing = profileUser?.followers?.some(follow => 
+    typeof follow === 'string' ? follow === currentUser?.id : (follow as { id: string }) === currentUser?.id
+  );
+  
+  const handleFollow = async () => {
+    if (!currentUser || !profileUser || followAnimating) return;
+    
+    setFollowAnimating(true);
+    
+    // Optimistically update UI immediately
+    const updatedFollowers = [...(profileUser.followers ?? []), currentUser.id];
+    setProfileUser(prev => prev ? {
+      ...prev,
+      followers: updatedFollowers
+    } : prev);
+
+    try {
+      await follow(profileUser._id);
+      
+      // Update current user's following list if updateUser function exists
+      if (updateUser) {
+        const updatedCurrentUser = {
+          ...currentUser,
+          following: [...(currentUser.following ?? []), profileUser._id]
+        };
+        updateUser(updatedCurrentUser);
+      }
+      
+      // Show success animation
+      setFollowSuccess(true);
+      setTimeout(() => setFollowSuccess(false), 1000);
+      
+    } catch (error) {
+      // Revert UI on error
+      setProfileUser(prev => prev ? {
+        ...prev,
+        followers: prev.followers.filter(follower => 
+          typeof follower === 'string' ? follower !== currentUser.id : follower.id !== currentUser.id
+        )
+      } : prev);
+      console.error('Error following user:', error);
+    } finally {
+      setTimeout(() => setFollowAnimating(false), 600);
+    }
+  };
+
+  const handleUnFollow = async () => {
+    if (!currentUser || !profileUser || followAnimating) return;
+    
+    setFollowAnimating(true);
+    
+    // Optimistically update UI immediately
+    const updatedFollowers = profileUser.followers.filter(follower => 
+      typeof follower === 'string' ? follower !== currentUser.id : follower._id !== currentUser.id
+    );
+    setProfileUser(prev => prev ? {
+      ...prev,
+      followers: updatedFollowers
+    } : prev);
+
+    try {
+      await unfollow(profileUser._id);
+      
+      // Update current user's following list if updateUser function exists
+      if (updateUser) {
+        const updatedCurrentUser = {
+          ...currentUser,
+          following: (currentUser.following ?? []).filter(id => id !== profileUser._id)
+        };
+        updateUser(updatedCurrentUser);
+      }
+      
+      // Show success animation
+      setFollowSuccess(true);
+      setTimeout(() => setFollowSuccess(false), 1000);
+      
+    } catch (error) {
+      // Revert UI on error
+      setProfileUser(prev => prev ? {
+        ...prev,
+        followers: [...(prev.followers ?? []), currentUser.id]
+      } : prev);
+      console.error('Error unfollowing user:', error);
+    } finally {
+      setTimeout(() => setFollowAnimating(false), 600);
     }
   };
 
@@ -229,7 +320,6 @@ const ProfilePage: React.FC = () => {
                       onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
                       className="text-2xl font-bold text-gray-900 bg-transparent border-b-2 border-purple-300 focus:border-purple-600 outline-none"
                     />
-
                   ) : (
                     <h1 className="text-2xl font-bold text-gray-900">@{profileUser.username}</h1>
                   )}
@@ -266,17 +356,39 @@ const ProfilePage: React.FC = () => {
                       </button>
                     )
                   ) : (
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all">
-                      {/* { isFollowing ? (
-                        <UserPlus className="w-4 h-4" />
-                        <span>Follow</span>
-                      ) :(
-                        <UserMinus className="w-4 h-4" />
-                        <span>Unfollow</span>
-                      )
-                      } */}
-                      <UserPlus className="w-4 h-4" />
-                      <span>Follow</span>
+                    <button 
+                      className={`relative flex items-center space-x-2 px-6 py-2 bg-gradient-to-r text-white rounded-lg transition-all duration-300 overflow-hidden ${
+                        isFollowing 
+                          ? 'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' 
+                          : 'from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
+                      } ${
+                        followAnimating ? 'scale-105 shadow-lg' : 'hover:shadow-md'
+                      } ${
+                        followSuccess ? 'animate-pulse' : ''
+                      }`}
+                      onClick={isFollowing ? handleUnFollow : handleFollow}
+                      disabled={followAnimating}
+                    >
+                      {/* Success overlay */}
+                      {followSuccess && (
+                        <div className="absolute inset-0 bg-green-500 flex items-center justify-center animate-fade-in">
+                          <Check className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                      
+                      {/* Button content */}
+                      <div className={`flex items-center space-x-2 transition-all duration-300 ${followAnimating ? 'scale-110' : ''}`}>
+                        {followAnimating ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : isFollowing ? (
+                          <UserMinus className="w-4 h-4" />
+                        ) : (
+                          <UserPlus className="w-4 h-4" />
+                        )}
+                        <span className="font-medium">
+                          {followAnimating ? 'Loading...' : isFollowing ? 'Unfollow' : 'Follow'}
+                        </span>
+                      </div>
                     </button>
                   )}
                 </div>
@@ -298,6 +410,7 @@ const ProfilePage: React.FC = () => {
                   </p>
                 )}
               </div>
+              
               <div className="flex items-center space-x-6 mt-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
@@ -306,7 +419,9 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <div className="flex flex-col items-center">
                     <button
-                      className="text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none"
+                      className={`text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none transition-all duration-300 ${
+                        followAnimating && !isOwnProfile ? 'animate-bounce' : ''
+                      }`}
                       onClick={() => handleList(profileUser.followers)}
                       type="button"
                     >
@@ -317,7 +432,7 @@ const ProfilePage: React.FC = () => {
                   {/* Following */}
                   <div className="flex flex-col items-center">
                     <button
-                      className="text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none"
+                      className="text-lg font-semibold text-gray-900 hover:text-purple-600 focus:outline-none transition-all duration-300"
                       onClick={() => handleList(profileUser.following)} 
                       type="button"
                     >
